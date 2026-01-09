@@ -1,16 +1,24 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { removeItemFromCart } from "../Redux-Tools/CartSlice";
+import { addItemToCart, removeItemFromCart } from "../Redux-Tools/CartSlice";
+import { AnimatePresence, motion } from "framer-motion";
+import QuantityDisplay from "./QuantityDisplay";
 
 const Cart = () => {
   const { items, totalQuantity, totalAmount } = useSelector(
     (state) => state.cart
   );
-
   const dispatch = useDispatch();
 
-  const removeHandler = (id) => {
-    dispatch(removeItemFromCart(id));
+  const addItem = (product) => {
+    dispatch(
+      addItemToCart({
+        id: product.id,
+        title: product.title,
+        price: product.price,
+        image: product.image,
+      })
+    );
   };
 
   return (
@@ -21,38 +29,45 @@ const Cart = () => {
             Total Price: ${Math.round(totalAmount)}
           </h1>
 
-          {/* Items Grid */}
           <section className="flex flex-row flex-wrap justify-center gap-8 m-10">
             {items.map((item) => (
-              <div
-                key={item.id}
-                className="flex flex-row p-4 rounded-xl shadow-lg w-full md:w-2/5 justify-around border border-gray-100"
-              >
+              <div className="flex flex-col md:flex-row items-center p-6 rounded-xl shadow-md border border-gray-200 bg-white hover:shadow-lg transition max-w-2xl">
+                {/* Product Image */}
                 <img
                   src={item.image}
-                  alt={item.name}
-                  className="w-5/12 h-44 object-contain p-2 border-r border-indigo-100"
+                  alt={item.title}
+                  className="w-32 h-32 object-contain mb-4 md:mb-0 md:mr-6"
                 />
-                <section className="flex flex-col justify-between p-2">
-                  <div>
-                    <p className="font-semibold text-gray-600">
-                      {item.quantity === 1 ? "Product" : "Products"}:{" "}
-                      {item.quantity}
-                    </p>
-                    <p className="text-xl font-bold mt-2">
-                      Total:{" "}
-                      <span className="text-indigo-600">
-                        ${Math.floor(item.totalPrice)}
-                      </span>
-                    </p>
+
+                {/* Product Details */}
+                <div className="flex flex-col flex-1 gap-3">
+                  <h2 className="text-lg font-semibold text-gray-800">
+                    {item.title}
+                  </h2>
+                  <p className="text-gray-500 text-sm">${item.price}</p>
+                  <p className="text-green-600 font-bold">
+                    Subtotal: ${Math.round(item.totalPrice)}
+                  </p>
+
+                  {/* Quantity Controls */}
+                  <div className="flex items-center gap-4">
+                    <button
+                      onClick={() => addItem(item)}
+                      className="bg-blue-500 hover:bg-blue-600 text-white w-8 h-8 rounded-full flex items-center justify-center transition"
+                    >
+                      +
+                    </button>
+
+                    <QuantityDisplay quantity={item.quantity} />
+
+                    <button
+                      onClick={() => dispatch(removeItemFromCart(item.id))}
+                      className="bg-gray-300 hover:bg-gray-400 text-gray-800 w-8 h-8 rounded-full flex items-center justify-center transition"
+                    >
+                      –
+                    </button>
                   </div>
-                  <button
-                    className="bg-red-500 hover:bg-black text-white py-2 px-4 rounded transition-colors duration-300"
-                    onClick={() => removeHandler(item.id)}
-                  >
-                    Remove Item
-                  </button>
-                </section>
+                </div>
               </div>
             ))}
           </section>
