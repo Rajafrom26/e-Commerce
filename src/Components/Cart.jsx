@@ -5,7 +5,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import QuantityDisplay from "./QuantityDisplay";
 
 const Cart = () => {
-  const { items, totalQuantity, totalAmount } = useSelector(
+  const { items, totalAmount } = useSelector(
     (state) => state.cart
   );
   const dispatch = useDispatch();
